@@ -1,13 +1,17 @@
-// The tower now tilts! Arrow keys (or the buttons) lean it left and right.
+// Step 3: the marble rolls with gravity inside the leaning tower!
 const canvas = document.getElementById('stage');
 const ctx = canvas.getContext('2d');
 
 const tower = { cx: 200, baseY: 450, w: 160, h: 340 };
-const marble = { x: 200, y: 0, r: 18 };
-marble.y = tower.baseY - 20 - marble.r;
+const WALL = 14; // thickness of the tower wall on each side
+const marble = { x: 200, vx: 0, r: 18 };
+// the marble lives in the tower's own space: x along the floor, floor at baseY - 20
+const floorY = tower.baseY - 20;
+const minX = tower.cx - tower.w / 2 + WALL + marble.r;
+const maxX = tower.cx + tower.w / 2 - WALL - marble.r;
+let spin = 0; // just for the little shine on the marble
 
-// tilt in radians; target is where I'm leaning towards, tilt eases to it
-const MAX_TILT = 0.35;
+const MAX_TILT = 0.3;
 let tilt = 0;
 let target = 0;
 const held = { left: false, right: false };
@@ -43,15 +47,6 @@ function hold(id, side) {
 hold('btnLeft', 'left');
 hold('btnRight', 'right');
 
-function drawStars() {
-  ctx.fillStyle = '#fff';
-  for (let i = 0; i < 25; i++) {
-    const x = (i * 97) % 400;
-    const y = (i * 53) % 200;
-    ctx.fillRect(x, y, 2, 2);
-  }
-}
-
 function drawTower() {
   const left = tower.cx - tower.w / 2;
   const top = tower.baseY - tower.h;
@@ -69,7 +64,7 @@ function drawTower() {
   }
 
   ctx.fillStyle = '#231d52';
-  ctx.fillRect(left + 14, top + 60, tower.w - 28, tower.h - 80);
+  ctx.fillRect(left + WALL, top + 60, tower.w - WALL * 2, tower.h - 80);
 
   ctx.fillStyle = '#e05a7a';
   ctx.beginPath();
@@ -86,18 +81,21 @@ function drawTower() {
 }
 
 function drawMarble() {
-  const g = ctx.createRadialGradient(marble.x - 6, marble.y - 6, 2, marble.x, marble.y, marble.r);
+  const y = floorY - marble.r;
+  // the shine circles around as the marble rolls
+  const sx = marble.x + Math.cos(spin - 2.3) * 8;
+  const sy = y + Math.sin(spin - 2.3) * 8;
+  const g = ctx.createRadialGradient(sx, sy, 2, marble.x, y, marble.r);
   g.addColorStop(0, '#ffffff');
   g.addColorStop(1, '#4fc3f7');
   ctx.fillStyle = g;
   ctx.beginPath();
-  ctx.arc(marble.x, marble.y, marble.r, 0, Math.PI * 2);
+  ctx.arc(marble.x, y, marble.r, 0, Math.PI * 2);
   ctx.fill();
 }
 
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawStars();
 
   // rotate tower and marble together around the bottom middle of the tower
   ctx.save();
@@ -109,10 +107,27 @@ function draw() {
   ctx.restore();
 }
 
-function frame() {
+// gravity pulls the marble along the floor by sin(tilt)
+const GRAVITY = 1400; // pixels per second squared
+let last = performance.now();
+
+function frame(now) {
+  const dt = Math.min((now - last) / 1000, 0.05);
+  last = now;
+
   // ease toward the target so the lean feels soft
   tilt += (target - tilt) * 0.12;
+
+  marble.vx += GRAVITY * Math.sin(tilt) * dt;
+  marble.vx *= Math.pow(0.6, dt); // a little friction
+  marble.x += marble.vx * dt;
+  spin += (marble.vx * dt) / marble.r;
+
+  // bounce softly off the walls
+  if (marble.x < minX) { marble.x = minX; marble.vx = Math.abs(marble.vx) * 0.45; }
+  if (marble.x > maxX) { marble.x = maxX; marble.vx = -Math.abs(marble.vx) * 0.45; }
+
   draw();
   requestAnimationFrame(frame);
 }
-frame();
+requestAnimationFrame(frame);
