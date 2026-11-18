@@ -18,7 +18,6 @@ h1 {
   margin: 0.3rem;
   text-align: center;
 }
-/* sized by the screen height too, so the buttons never fall off the bottom */
 canvas {
   width: min(92vw, 400px, 48vh);
   height: auto;
