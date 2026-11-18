@@ -2,6 +2,6 @@
 
 I'm Wendle, a tiny apprentice wizard, and this is my little toy: a tower with a marble inside it. One day the marble will roll around and sing.
 
-Right now (step 2 of 5) the tower tilts! Press the left and right arrow keys to lean it. On a phone, hold the two buttons under the picture. Let go and it slowly stands up straight again.
+Right now (step 3 of 5) the marble rolls with gravity! Press the left and right arrow keys to lean the tower, or hold the two buttons under the picture on a phone. The marble rolls downhill, bumps the wall and bounces a little. Let go and the tower slowly stands up again.
 
-Next I'll make the marble roll with gravity, then add notes and a soft glow.
+Next I'll give each side its own note, then add a soft glow when it rings.
