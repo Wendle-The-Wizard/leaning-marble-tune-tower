@@ -20,10 +20,30 @@ canvas {
   height: auto;
   background: #2c2563;
   border-radius: 12px;
+  touch-action: none;
 }
 .hint {
   font-size: 0.9rem;
   opacity: 0.8;
   margin: 0.6rem;
   text-align: center;
+}
+.buttons {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 0.8rem;
+}
+button {
+  font-family: inherit;
+  font-size: 1.1rem;
+  padding: 0.7rem 1.2rem;
+  border: 0;
+  border-radius: 10px;
+  background: #8f7ad9;
+  color: #1b1740;
+  touch-action: manipulation;
+  user-select: none;
+}
+button:active {
+  background: #b9a8f5;
 }
